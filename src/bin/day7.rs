@@ -13,54 +13,44 @@ fn main() {
 
     let result: u64 = lines
         .iter()
-        .filter(|line| validate(&line, 0, None, &None))
+        .filter(|line| validate(&line, 1, line.numbers[0]))
         .inspect(|line| println!("{:?}", line))
         .map(|line| line.test_value)
         .sum();
 
-    println!("result {}", result);
+    println!("result {}", result); //333027885676693
 }
 
-fn validate(line: &Line, position: usize, calculated: Option<u64>, log: &Option<String>) -> bool {
+fn validate(line: &Line, position: usize, calculated: u64) -> bool {
     if position == line.numbers.len() {
-        calculated.is_some_and(|c| c == line.test_value)
-    } else if calculated.is_some_and(|c| c > line.test_value) {
+        calculated== line.test_value
+    } else if calculated > line.test_value {
         false
     } else {
         let next_val = line.numbers[position];
-        let new_log = match log {
-            None => "",
-            Some(s) => s,
-        };
 
-        let new_calculated = calculated.unwrap_or(0) + next_val;
+        let new_calculated = calculated + next_val;
         let mut is_valid = validate(
             line,
             position + 1,
-            Some(new_calculated),
-            &Some(format!("{} + {}", new_log, next_val)),
+            new_calculated
         );
         if !is_valid {
-            let new_calculated = calculated
-                .map(|last_val| last_val.to_string() + &next_val.to_string())
-                .map_or(next_val, |s| s.parse::<u64>().unwrap());
+            let new_calculated = (calculated.to_string() + &next_val.to_string()).parse::<u64>().unwrap();
             is_valid = validate(
                 line,
                 position + 1,
-                Some(new_calculated),
-                &Some(format!("{}{}", new_log, next_val)),
+              new_calculated
             );
         }
         if !is_valid {
-            let new_calculated = calculated.unwrap_or(1) * next_val;
+            let new_calculated = calculated * next_val;
             is_valid = validate(
                 line,
                 position + 1,
-                Some(new_calculated),
-                &Some(format!("{} * {}", new_log, next_val)),
+              new_calculated
             );
         }
-
         is_valid
     }
 }
