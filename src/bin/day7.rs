@@ -1,4 +1,4 @@
-use std::fmt::format;
+
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 fn main() {
